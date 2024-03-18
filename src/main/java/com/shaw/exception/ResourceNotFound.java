@@ -1,21 +1,21 @@
 package com.shaw.exception;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class ResourceNotFound extends Exception {
 
 	private String resourceNameString;
 	private String fieldNameString;
 	private Integer fieldValue;
 
-	public ResourceNotFound(String resourceNameString, String fieldNameString, Integer fieldValue) {
-		super(resourceNameString + " not find with " + fieldNameString + ": " + fieldValue);
-		this.resourceNameString = resourceNameString;
-		this.fieldNameString = fieldNameString;
-		this.fieldValue = fieldValue;
-	}
+	@Override
+    public String getMessage() {
+        return String.format("%s not found with %s: %s", resourceNameString, fieldNameString, fieldValue);
+    }
 
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shaw.exception.ResourceNotFound;
+import com.shaw.payloads.ApiResponse;
 import com.shaw.payloads.UserDto;
 import com.shaw.service.impl.UserServiceImpl;
 
@@ -32,12 +33,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable("id") Integer id) {
+    public ResponseEntity<?> getUser(@PathVariable("id") Integer id) {
         try {
             UserDto userDto = userServiceImpl.getUser(id);
             return new ResponseEntity<>(userDto, HttpStatus.OK);
         } catch (ResourceNotFound ex) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
@@ -48,22 +49,24 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable("id") Integer id, @RequestBody UserDto userDto) {
+    public ResponseEntity<?> updateUser(@PathVariable("id") Integer id, @RequestBody UserDto userDto) {
         try {
             UserDto updatedUser = userServiceImpl.updateUser(userDto, id);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
         } catch (ResourceNotFound ex) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") Integer id) {
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable("id") Integer id) {
         try {
             userServiceImpl.deleteUser(id);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(true, "User deleted successfully"), HttpStatus.OK);
         } catch (ResourceNotFound ex) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ApiResponse(false, ex.getMessage()), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse(true, "Failed to delete user"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
