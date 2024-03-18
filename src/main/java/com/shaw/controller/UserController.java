@@ -19,54 +19,58 @@ import com.shaw.payloads.ApiResponse;
 import com.shaw.payloads.UserDto;
 import com.shaw.service.impl.UserServiceImpl;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
 
 	@Autowired
-    private UserServiceImpl userServiceImpl;
+	private UserServiceImpl userServiceImpl;
 
-    @PostMapping("/")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
-        UserDto userResDto = userServiceImpl.createUser(userDto);
-        return new ResponseEntity<>(userResDto, HttpStatus.CREATED);
-    }
+	@PostMapping("/")
+	public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
+		UserDto userResDto = userServiceImpl.createUser(userDto);
+		return new ResponseEntity<>(userResDto, HttpStatus.CREATED);
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getUser(@PathVariable("id") Integer id) {
-        try {
-            UserDto userDto = userServiceImpl.getUser(id);
-            return new ResponseEntity<>(userDto, HttpStatus.OK);
-        } catch (ResourceNotFound ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getUser(@PathVariable("id") Integer id) {
+		try {
+			UserDto userDto = userServiceImpl.getUser(id);
+			return new ResponseEntity<>(userDto, HttpStatus.OK);
+		} catch (ResourceNotFound ex) {
+			return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
 
-    @GetMapping("/")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> usersDto = userServiceImpl.getAllUser();
-        return new ResponseEntity<>(usersDto, HttpStatus.OK);
-    }
+	@GetMapping("/")
+	public ResponseEntity<List<UserDto>> getAllUsers() {
+		List<UserDto> usersDto = userServiceImpl.getAllUser();
+		return new ResponseEntity<>(usersDto, HttpStatus.OK);
+	}
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") Integer id, @RequestBody UserDto userDto) {
-        try {
-            UserDto updatedUser = userServiceImpl.updateUser(userDto, id);
-            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-        } catch (ResourceNotFound ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
+	@PutMapping("/{id}")
+	public ResponseEntity<?> updateUser(@PathVariable("id") Integer id,@Valid @RequestBody UserDto userDto) {
+		try {
+			UserDto updatedUser = userServiceImpl.updateUser(userDto, id);
+			return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+		} catch (ResourceNotFound ex) {
+			return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteUser(@PathVariable("id") Integer id) {
-        try {
-            userServiceImpl.deleteUser(id);
-            return new ResponseEntity<>(new ApiResponse(true, "User deleted successfully"), HttpStatus.OK);
-        } catch (ResourceNotFound ex) {
-            return new ResponseEntity<>(new ApiResponse(false, ex.getMessage()), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ApiResponse(true, "Failed to delete user"), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<ApiResponse> deleteUser(@PathVariable("id") Integer id) throws ResourceNotFound {
+		userServiceImpl.deleteUser(id);
+		return new ResponseEntity<>(new ApiResponse(true, "User deleted successfully"), HttpStatus.OK);
+//        try {
+//            userServiceImpl.deleteUser(id);
+//            return new ResponseEntity<>(new ApiResponse(true, "User deleted successfully"), HttpStatus.OK);
+//        } catch (ResourceNotFound ex) {
+//            return new ResponseEntity<>(new ApiResponse(false, ex.getMessage()), HttpStatus.NOT_FOUND);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(new ApiResponse(true, "Failed to delete user"), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+	}
 }
