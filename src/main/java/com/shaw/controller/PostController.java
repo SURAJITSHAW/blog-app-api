@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shaw.exception.ResourceNotFound;
+import com.shaw.payloads.ApiResponse;
 import com.shaw.payloads.PostDto;
 import com.shaw.service.PostService;
 
@@ -25,50 +26,93 @@ public class PostController {
 	@Autowired
 	private PostService postService;
 	
-	@PostMapping("/user/{userId}/category/{categoryId}")
-	public ResponseEntity<PostDto> createPost(
-			@RequestBody PostDto postDto,
-			@PathVariable Integer userId,
-			@PathVariable Integer categoryId) throws ResourceNotFound{
-		PostDto createPost = this.postService.createPost(postDto, userId, categoryId);
-		return new ResponseEntity<PostDto>(createPost, HttpStatus.CREATED); 
-	}
 	
-	@GetMapping("/{postId}")
-    public ResponseEntity<PostDto> getPostById(@PathVariable Integer postId) throws ResourceNotFound {
+	@PostMapping("/user/{userId}/category/{categoryId}")
+    public ResponseEntity<ApiResponse<PostDto>> createPost(
+            @RequestBody PostDto postDto,
+            @PathVariable Integer userId,
+            @PathVariable Integer categoryId) throws ResourceNotFound {
+        PostDto createdPostDto = postService.createPost(postDto, userId, categoryId);
+        ApiResponse<PostDto> response = new ApiResponse<>(
+            HttpStatus.CREATED.value(),
+            "Post created successfully",
+            createdPostDto,
+            null
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+    @GetMapping("/{postId}")
+    public ResponseEntity<ApiResponse<PostDto>> getPostById(@PathVariable Integer postId) throws ResourceNotFound {
         PostDto postDto = postService.getPostById(postId);
-        return ResponseEntity.ok(postDto);
+        ApiResponse<PostDto> response = new ApiResponse<>(
+            HttpStatus.OK.value(),
+            "Post retrieved successfully",
+            postDto,
+            null
+        );
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<PostDto> updatePost(@PathVariable Integer postId, @RequestBody PostDto postDto) throws ResourceNotFound {
+    public ResponseEntity<ApiResponse<PostDto>> updatePost(@PathVariable Integer postId, @RequestBody PostDto postDto) throws ResourceNotFound {
         postDto.setId(postId);
         PostDto updatedPostDto = postService.updatePost(postDto);
-        return ResponseEntity.ok(updatedPostDto);
+        ApiResponse<PostDto> response = new ApiResponse<>(
+            HttpStatus.OK.value(),
+            "Post updated successfully",
+            updatedPostDto,
+            null
+        );
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Integer postId) throws ResourceNotFound {
+    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Integer postId) throws ResourceNotFound {
         postService.deletePost(postId);
-        return ResponseEntity.noContent().build();
+        ApiResponse<Void> response = new ApiResponse<>(
+            HttpStatus.OK.value(),
+            "Post deleted successfully",
+            null,
+            null
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<PostDto>> getAllPosts() {
+    public ResponseEntity<ApiResponse<List<PostDto>>> getAllPosts() {
         List<PostDto> posts = postService.getAllPosts();
-        return ResponseEntity.ok(posts);
+        ApiResponse<List<PostDto>> response = new ApiResponse<>(
+            HttpStatus.OK.value(),
+            "All posts retrieved successfully",
+            posts,
+            null
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<PostDto>> findPostsByUser(@PathVariable Integer userId) throws ResourceNotFound {
+    public ResponseEntity<ApiResponse<List<PostDto>>> findPostsByUser(@PathVariable Integer userId) throws ResourceNotFound {
         List<PostDto> posts = postService.findPostsByUser(userId);
-        return ResponseEntity.ok(posts);
+        ApiResponse<List<PostDto>> response = new ApiResponse<>(
+            HttpStatus.OK.value(),
+            "Posts retrieved successfully by user",
+            posts,
+            null
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<PostDto>> findPostsByCategory(@PathVariable Integer categoryId) throws ResourceNotFound {
+    public ResponseEntity<ApiResponse<List<PostDto>>> findPostsByCategory(@PathVariable Integer categoryId) throws ResourceNotFound {
         List<PostDto> posts = postService.findPostsByCategory(categoryId);
-        return ResponseEntity.ok(posts);
+        ApiResponse<List<PostDto>> response = new ApiResponse<>(
+            HttpStatus.OK.value(),
+            "Posts retrieved successfully by category",
+            posts,
+            null
+        );
+        return ResponseEntity.ok(response);
     }
 
 //    @GetMapping("/search")

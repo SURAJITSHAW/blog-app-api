@@ -31,60 +31,50 @@ public class UserController {
 	@Autowired
 	private UserServiceImpl userServiceImpl;
 
-//	@PostMapping("/")
-//	public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
-//		UserDto userResDto = userServiceImpl.createUser(userDto);
-//		return new ResponseEntity<>(userResDto, HttpStatus.CREATED);
-//	}
-	
 	@PostMapping("/")
-	public ResponseEntity<Object> createUser(@Valid @RequestBody UserDto userDto, HttpServletRequest request) {
-	    UserDto createdUserDto = userServiceImpl.createUser(userDto);
-	    
-	    // Construct the URI of the created resource
-	    URI location = ServletUriComponentsBuilder
-	                    .fromRequestUri(request)
-	                    .path("/{id}")
-	                    .buildAndExpand(createdUserDto.getId())
-	                    .toUri();
-	    
-	    // Create a custom response object with the created user DTO and additional information
-	    ApiResponse<UserDto> response = new ApiResponse<>(
-	        HttpStatus.CREATED.value(),
-	        "User created successfully",
-	        createdUserDto,
-	        location
-	    );
-	    
-	    return ResponseEntity.created(location).body(response);
-	}
+    public ResponseEntity<ApiResponse<UserDto>> createUser(@Valid @RequestBody UserDto userDto, HttpServletRequest request) {
+        UserDto createdUserDto = userServiceImpl.createUser(userDto);
+        URI location = ServletUriComponentsBuilder
+                        .fromRequestUri(request)
+                        .path("/{id}")
+                        .buildAndExpand(createdUserDto.getId())
+                        .toUri();
+        ApiResponse<UserDto> response = new ApiResponse<>(
+            HttpStatus.CREATED.value(),
+            "User created successfully",
+            createdUserDto,
+            location
+        );
+        return ResponseEntity.created(location).body(response);
+    }
 
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getUser(@PathVariable("id") Integer id) {
-		try {
-			UserDto userDto = userServiceImpl.getUser(id);
-			return new ResponseEntity<>(userDto, HttpStatus.OK);
-		} catch (ResourceNotFound ex) {
-			return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-		}
-	}
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserDto>> getUser(@PathVariable("id") Integer id) {
+        try {
+            UserDto userDto = userServiceImpl.getUser(id);
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "User retrieved successfully", userDto, null));
+        } catch (ResourceNotFound ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "User not found", null, null));
+        }
+    }
 
-	@GetMapping("/")
-	public ResponseEntity<List<UserDto>> getAllUsers() {
-		List<UserDto> usersDto = userServiceImpl.getAllUser();
-		return new ResponseEntity<>(usersDto, HttpStatus.OK);
-	}
+    @GetMapping("/")
+    public ResponseEntity<ApiResponse<List<UserDto>>> getAllUsers() {
+        List<UserDto> usersDto = userServiceImpl.getAllUser();
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "All users retrieved successfully", usersDto, null));
+    }
 
-	@PutMapping("/{id}")
-	public ResponseEntity<?> updateUser(@PathVariable("id") Integer id,@Valid @RequestBody UserDto userDto) {
-		try {
-			UserDto updatedUser = userServiceImpl.updateUser(userDto, id);
-			return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-		} catch (ResourceNotFound ex) {
-			return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-		}
-	}
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserDto>> updateUser(@PathVariable("id") Integer id,@Valid @RequestBody UserDto userDto) {
+        try {
+            UserDto updatedUser = userServiceImpl.updateUser(userDto, id);
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "User updated successfully", updatedUser, null));
+        } catch (ResourceNotFound ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(HttpStatus.NOT_FOUND.value(), "User not found", null, null));
+        }
+    }
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable("id") Integer id) {

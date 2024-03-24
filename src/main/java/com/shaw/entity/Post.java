@@ -29,12 +29,12 @@ public class Post {
     
 	@Column(length = 100, nullable = false)
     private String title;
-	@Column(length = 1000)
+	@Column(columnDefinition = "TEXT") 
     private String content;
     private String imageName;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name 	= "user_id")
     private User user;
     
     @ManyToOne(fetch = FetchType.LAZY)
