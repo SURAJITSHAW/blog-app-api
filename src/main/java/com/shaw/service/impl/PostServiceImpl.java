@@ -1,6 +1,8 @@
 package com.shaw.service.impl;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,9 +86,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse getAllPosts(Integer pageNumber, Integer pageSize) {
+    public PostResponse getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
     	
-    	Pageable pageable = PageRequest.of(pageNumber, pageSize);
+    	Sort sort = (sortDir.equalsIgnoreCase("asc") == true ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending());
+    	
+    	Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
     	
         Page<Post> all = postRepo.findAll(pageable);
         List<Post> posts = all.getContent();

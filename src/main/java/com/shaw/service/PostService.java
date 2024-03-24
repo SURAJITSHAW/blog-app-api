@@ -26,7 +26,7 @@ public interface PostService {
     void deletePost(Integer postId) throws ResourceNotFound;
 
     // Retrieve all posts
-    PostResponse getAllPosts(Integer pageNumber, Integer pageSize);
+    PostResponse getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 
     // Find posts by user
     List<PostDto> findPostsByUser(Integer userId) throws ResourceNotFound;

@@ -83,10 +83,12 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<PostResponse>> getAllPosts(
-    			@RequestParam(defaultValue = "10") int pageSize,
-    			@RequestParam(defaultValue = "0") int pageNumber
+    			@RequestParam(defaultValue = "10", required = false) int pageSize,
+    			@RequestParam(defaultValue = "0", required = false) int pageNumber, 
+    			@RequestParam(defaultValue = "id", required = false) String sortBy,
+    			@RequestParam(defaultValue = "asc", required = false) String sortDir
     		) {
-    	PostResponse posts = postService.getAllPosts(pageNumber, pageSize);
+    	PostResponse posts = postService.getAllPosts(pageNumber, pageSize, sortBy, sortDir);
         ApiResponse<PostResponse> response = new ApiResponse<>(
             HttpStatus.OK.value(),
             "All posts retrieved successfully",
