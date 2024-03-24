@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.shaw.exception.ResourceNotFound;
 import com.shaw.payloads.ApiResponse;
 import com.shaw.payloads.PostDto;
+import com.shaw.payloads.PostResponse;
 import com.shaw.service.PostService;
 
 @RestController
@@ -80,9 +82,12 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PostDto>>> getAllPosts() {
-        List<PostDto> posts = postService.getAllPosts();
-        ApiResponse<List<PostDto>> response = new ApiResponse<>(
+    public ResponseEntity<ApiResponse<PostResponse>> getAllPosts(
+    			@RequestParam(defaultValue = "10") int pageSize,
+    			@RequestParam(defaultValue = "0") int pageNumber
+    		) {
+    	PostResponse posts = postService.getAllPosts(pageNumber, pageSize);
+        ApiResponse<PostResponse> response = new ApiResponse<>(
             HttpStatus.OK.value(),
             "All posts retrieved successfully",
             posts,

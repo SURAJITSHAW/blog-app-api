@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.shaw.entity.Category;
 import com.shaw.payloads.PostDto;
+import com.shaw.payloads.PostResponse;
 import com.shaw.entity.User;
 import com.shaw.exception.ResourceNotFound;
 
@@ -25,7 +26,7 @@ public interface PostService {
     void deletePost(Integer postId) throws ResourceNotFound;
 
     // Retrieve all posts
-    List<PostDto> getAllPosts();
+    PostResponse getAllPosts(Integer pageNumber, Integer pageSize);
 
     // Find posts by user
     List<PostDto> findPostsByUser(Integer userId) throws ResourceNotFound;

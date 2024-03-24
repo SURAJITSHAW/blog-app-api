@@ -1,11 +1,14 @@
 package com.shaw.service.impl;
 
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.shaw.entity.Category;
@@ -13,6 +16,7 @@ import com.shaw.entity.Post;
 import com.shaw.entity.User;
 import com.shaw.exception.ResourceNotFound;
 import com.shaw.payloads.PostDto;
+import com.shaw.payloads.PostResponse;
 import com.shaw.repository.CategoryRepo;
 import com.shaw.repository.PostRepo;
 import com.shaw.repository.UserRepo;
@@ -80,11 +84,27 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPosts() {
-        List<Post> posts = postRepo.findAll();
-        return posts.stream()
+    public PostResponse getAllPosts(Integer pageNumber, Integer pageSize) {
+    	
+    	Pageable pageable = PageRequest.of(pageNumber, pageSize);
+    	
+        Page<Post> all = postRepo.findAll(pageable);
+        List<Post> posts = all.getContent();
+        
+        List<PostDto> postDtos = posts.stream()
                     .map(post -> modelMapper.map(post, PostDto.class))
                     .collect(Collectors.toList());
+        
+        PostResponse postResponse = new PostResponse();
+        
+        postResponse.setPageNumber(all.getNumber());
+        postResponse.setPageSize(all.getSize());
+        postResponse.setLastPage(all.isLast());
+        postResponse.setTotalpages(all.getTotalPages());
+        postResponse.setTotalElements(all.getTotalElements());
+        postResponse.setContent(postDtos);
+        
+        return postResponse;
     }
 
     @Override
