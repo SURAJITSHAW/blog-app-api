@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shaw.exception.ResourceNotFound;
 import com.shaw.payloads.CategoryDto;
-import com.shaw.service.CategoryService;
 import com.shaw.service.impl.CategoryServiceImpl;
 
 import jakarta.validation.Valid;

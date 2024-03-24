@@ -1,5 +1,6 @@
 package com.shaw.controller;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.shaw.exception.ResourceNotFound;
 import com.shaw.payloads.ApiResponse;
 import com.shaw.payloads.UserDto;
 import com.shaw.service.impl.UserServiceImpl;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -28,12 +31,35 @@ public class UserController {
 	@Autowired
 	private UserServiceImpl userServiceImpl;
 
+//	@PostMapping("/")
+//	public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
+//		UserDto userResDto = userServiceImpl.createUser(userDto);
+//		return new ResponseEntity<>(userResDto, HttpStatus.CREATED);
+//	}
+	
 	@PostMapping("/")
-	public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
-		UserDto userResDto = userServiceImpl.createUser(userDto);
-		return new ResponseEntity<>(userResDto, HttpStatus.CREATED);
+	public ResponseEntity<Object> createUser(@Valid @RequestBody UserDto userDto, HttpServletRequest request) {
+	    UserDto createdUserDto = userServiceImpl.createUser(userDto);
+	    
+	    // Construct the URI of the created resource
+	    URI location = ServletUriComponentsBuilder
+	                    .fromRequestUri(request)
+	                    .path("/{id}")
+	                    .buildAndExpand(createdUserDto.getId())
+	                    .toUri();
+	    
+	    // Create a custom response object with the created user DTO and additional information
+	    ApiResponse<UserDto> response = new ApiResponse<>(
+	        HttpStatus.CREATED.value(),
+	        "User created successfully",
+	        createdUserDto,
+	        location
+	    );
+	    
+	    return ResponseEntity.created(location).body(response);
 	}
 
+	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getUser(@PathVariable("id") Integer id) {
 		try {
@@ -61,16 +87,17 @@ public class UserController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ApiResponse> deleteUser(@PathVariable("id") Integer id) throws ResourceNotFound {
-		userServiceImpl.deleteUser(id);
-		return new ResponseEntity<>(new ApiResponse(true, "User deleted successfully"), HttpStatus.OK);
-//        try {
-//            userServiceImpl.deleteUser(id);
-//            return new ResponseEntity<>(new ApiResponse(true, "User deleted successfully"), HttpStatus.OK);
-//        } catch (ResourceNotFound ex) {
-//            return new ResponseEntity<>(new ApiResponse(false, ex.getMessage()), HttpStatus.NOT_FOUND);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(new ApiResponse(true, "Failed to delete user"), HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
+	public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable("id") Integer id) {
+	    try {
+	        userServiceImpl.deleteUser(id);
+	        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.value(), "User deleted successfully", null, null));
+	    } catch (ResourceNotFound ex) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                .body(new ApiResponse<>(HttpStatus.NOT_FOUND.value(), ex.getMessage(), null, null));
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body(new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Failed to delete user", null, null));
+	    }
 	}
+
 }
