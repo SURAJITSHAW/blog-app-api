@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.shaw.entity.User;
@@ -21,6 +22,9 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	 @Autowired
+	 private PasswordEncoder passwordEncoder;
 
 	@Override
 	public UserDto getUser(Integer id) throws ResourceNotFound {
@@ -49,11 +53,19 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDto createUser(UserDto userDto) {
-		User user = dtoToUser(userDto);
-		User savedUser = userRepo.save(user);
-		return userToDto(savedUser);
-	}
+    public UserDto createUser(UserDto userDto) {
+        // Convert userDto to User entity
+        User user = dtoToUser(userDto);
+
+        // Encode password before persisting
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+
+        // Save the user and get the persisted entity
+        User savedUser = userRepo.save(user);
+
+        // Convert the persisted User entity back to UserDto, excluding password
+        return userToDto(savedUser);
+    }
 
 	private void updateUserDetails(User user, UserDto userDto) {
 	    if (userDto.getName() != null) {
