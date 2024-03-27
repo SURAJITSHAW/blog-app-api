@@ -723,3 +723,38 @@ http://127.0.0.1:9090/v1
       "location": "null"
   }
   ```
+# Getting Started: Setting Up the Project Locally
+
+Setting up the project locally is quick and easy. Follow these steps to get started with your Spring Boot project:
+
+1. **Clone the Repository:**
+   - Begin by cloning the project repository from GitHub using the following command:
+     ```
+     git clone https://github.com/SURAJITSHAW/blog-app-api.git
+     ```
+
+2. **Open in IDE:**
+   - Navigate to the project directory and open it in your preferred Integrated Development Environment (IDE) such as IntelliJ IDEA, Eclipse, or Spring Tool Suite.
+
+3. **Configure MySQL Database:**
+   - Ensure that MySQL is installed and running on your local machine.
+   - Open the `application.properties` file located in the `src/main/resources` directory.
+   - Configure the database connection properties such as URL, username, and password according to your MySQL setup.
+
+4. **Build the Project:**
+   - Build the project using Maven. Run the following command in the project root directory:
+     ```
+     mvn clean install
+     ```
+
+5. **Run the Application:**
+   - Start the Spring Boot application by running the main class (`BlogAppApiApplication.java`) in your IDE.
+   - Alternatively, you can run the application from the command line using Maven:
+     ```
+     mvn spring-boot:run
+     ```
+
+6. **Verify Installation:**
+   - Once the application is up and running, access the API endpoints locally using tools like Postman or a web browser to ensure everything is working as expected.
+
+With these steps, you should be all set to explore the functionalities of your Spring Boot project locally. Enjoy coding! 🚀
